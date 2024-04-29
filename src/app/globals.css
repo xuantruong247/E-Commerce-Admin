@@ -6,6 +6,12 @@ html,
 body:root {
   height: 100%;
 }
+.data-\[disabled\]\:opacity-50[data-disabled] {
+  opacity: 1  !important;
+}
+.data-\[disabled\]\:pointer-events-none[data-disabled] {
+  pointer-events: auto !important;
+}
 
 @layer base {
   :root {
