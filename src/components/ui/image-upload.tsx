@@ -34,12 +34,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   }
 
   return (
-    <div>
-      <div className="mb-4 flex flex-col gap-4">
+    <div className="mb-4 flex flex-col gap-4">
+      <div className="flex flex-wrap mb-4 gap-4">
         {value.map((url) => (
           <div
             key={url}
-            className="relative w-[200px] h-[200px] rounded-md overflow-hidden"
+            className="relative w-[200px] h-[200px] rounded-md overflow-hidden "
           >
             <div className="absolute z-10 top-2 right-2">
               <Button
@@ -55,25 +55,25 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             <Image src={url} fill className="object-cover" alt="Image" />
           </div>
         ))}
-        <div>
-          <CldUploadWidget onUpload={onUpload} uploadPreset="obunkar6">
-            {({ open }) => {
-              return (
-                <Button
-                  onClick={() => {
-                    open();
-                  }}
-                  type="button"
-                  variant="secondary"
-                  disabled={disabled}
-                >
-                  <ImagePlus className="h-4 w-4 mr-2" />
-                  Upload an Image
-                </Button>
-              );
-            }}
-          </CldUploadWidget>
-        </div>
+      </div>
+      <div>
+        <CldUploadWidget onUpload={onUpload} uploadPreset="obunkar6">
+          {({ open }) => {
+            return (
+              <Button
+                onClick={() => {
+                  open();
+                }}
+                type="button"
+                variant="secondary"
+                disabled={disabled}
+              >
+                <ImagePlus className="h-4 w-4 mr-2" />
+                Upload an Image
+              </Button>
+            );
+          }}
+        </CldUploadWidget>
       </div>
     </div>
   );

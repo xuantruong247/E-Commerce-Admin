@@ -23,7 +23,7 @@ const SizeClient: React.FC<sizeClientProps> = ({ data }) => {
       <div className="flex items-center justify-between">
         <Heading
           title={`Size (${data.length})`}
-          description="Manage billboards for you store"
+          description="Manage size for you store"
         />
         <Button
           onClick={() => {

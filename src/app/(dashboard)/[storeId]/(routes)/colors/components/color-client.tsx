@@ -23,7 +23,7 @@ const ColorClient: React.FC<colorClientProps> = ({ data }) => {
       <div className="flex items-center justify-between">
         <Heading
           title={`Color (${data.length})`}
-          description="Manage billboards for you store"
+          description="Manage color for you store"
         />
         <Button
           onClick={() => {
