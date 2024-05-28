@@ -11,11 +11,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
-import ImageUpload from "@/components/ui/image-upload";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Billboard } from "@prisma/client";
+import { Color } from "@prisma/client";
 import axios from "axios";
 import { Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -24,51 +23,54 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import * as z from "zod";
 
-interface BillboardsFormProps {
-  initialData: Billboard | null;
+interface ColorsFormProps {
+  initialData: Color | null;
 }
 
 const formSchema = z.object({
-  label: z.string().min(1),
-  imageUrl: z.string().min(1),
+  name: z.string().min(1),
+  value: z.string().min(4).regex(/^#/, {
+    message: "String must be a valid hex code",
+  }),
 });
 
-type BillboardsFormValues = z.infer<typeof formSchema>;
+type ColorFormValues = z.infer<typeof formSchema>;
 
-const BillboardsForm: React.FC<BillboardsFormProps> = ({ initialData }) => {
+const ColorsForm: React.FC<ColorsFormProps> = ({ initialData = null }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const params = useParams();
 
-  const title = initialData ? "Edit billboard" : "Create billboard";
-  const description = initialData ? "Edit a billboard" : "Add a new billboard";
-  const toastMessage = initialData
-    ? "Billboard updated."
-    : "Billboard created.";
-  const action = initialData ? "Saves change" : "Create billboard";
+  const title = initialData ? "Edit color" : "Create color";
+  const description = initialData ? "Edit a color" : "Add a new color";
+  const toastMessage = initialData ? "Color updated." : "Color created.";
+  const action = initialData ? "Saves change" : "Create color";
 
-  const form = useForm<BillboardsFormValues>({
+  const form = useForm<ColorFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
-      label: "",
-      imageUrl: "",
+      name: "",
+      value: "",
     },
   });
+  console.log(params.colorId);
 
-  const onSubmit = async (data: BillboardsFormValues) => {
+  const onSubmit = async (data: ColorFormValues) => {
     try {
       setLoading(true);
       if (initialData) {
         await axios.patch(
-          `/api/stores/${params.storeId}/billboards/${params.billboardId}`,
+          `/api/stores/${params.storeId}/colors/${params.colorId}`,
           data
         );
       } else {
-        await axios.post(`/api/stores/${params.storeId}/billboards`, data);
+        await axios.post(`/api/stores/${params.storeId}/colors`, data);
       }
-      router.refresh()
-      router.push(`/${params.storeId}/billboards`);
+      router.replace("/");
+
+      router.refresh();
+      router.push(`/${params.storeId}/colors`);
       toast.success(toastMessage);
     } catch (error) {
       toast.error("Something went wrong");
@@ -81,15 +83,17 @@ const BillboardsForm: React.FC<BillboardsFormProps> = ({ initialData }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `/api/stores/${params.storeId}/billboards/${params.billboardId}`
+        `/api/stores/${params.storeId}/colors/${params.colorId}`
       );
 
+      router.replace("/");
       router.refresh();
-      router.push("/");
-      toast.success("Billboards deleted");
+
+      router.push(`/${params.storeId}/colors`);
+      toast.success("colors deleted");
     } catch (error) {
       toast.error(
-        "Make sure you removed all categories using this billboard first."
+        "Make sure you removed all categories using this color first."
       );
     } finally {
       setLoading(false);
@@ -126,39 +130,42 @@ const BillboardsForm: React.FC<BillboardsFormProps> = ({ initialData }) => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-semibold">
-                  Background image
-                </FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    value={field.value ? [field.value] : []}
-                    disabled={loading}
-                    onChange={(url) => field.onChange(url)}
-                    onRemove={() => field.onChange("")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <div className="grid grid-cols-3 gap-8">
             <FormField
               control={form.control}
-              name="label"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-semibold">Label</FormLabel>
+                  <FormLabel className="font-semibold">Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Billboard label..."
+                      placeholder="Color name..."
                       disabled={loading}
                       {...field}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold">Value</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center gap-x-4">
+                      <Input
+                        placeholder="Color value..."
+                        disabled={loading}
+                        {...field}
+                      />
+                      <div
+                        className="border p-4 rounded-full"
+                        style={{ backgroundColor: field.value }}
+                      ></div>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -174,4 +181,4 @@ const BillboardsForm: React.FC<BillboardsFormProps> = ({ initialData }) => {
   );
 };
 
-export default BillboardsForm;
+export default ColorsForm;

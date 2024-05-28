@@ -11,11 +11,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Heading from "@/components/ui/heading";
-import ImageUpload from "@/components/ui/image-upload";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Billboard } from "@prisma/client";
+import { Size } from "@prisma/client";
 import axios from "axios";
 import { Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -24,51 +23,52 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import * as z from "zod";
 
-interface BillboardsFormProps {
-  initialData: Billboard | null;
+interface SizesFormProps {
+  initialData: Size | null;
 }
 
 const formSchema = z.object({
-  label: z.string().min(1),
-  imageUrl: z.string().min(1),
+  name: z.string().min(1),
+  value: z.string().min(1),
 });
 
-type BillboardsFormValues = z.infer<typeof formSchema>;
+type SizeFormValues = z.infer<typeof formSchema>;
 
-const BillboardsForm: React.FC<BillboardsFormProps> = ({ initialData }) => {
+const SizesForm: React.FC<SizesFormProps> = ({ initialData = null }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const params = useParams();
 
-  const title = initialData ? "Edit billboard" : "Create billboard";
-  const description = initialData ? "Edit a billboard" : "Add a new billboard";
-  const toastMessage = initialData
-    ? "Billboard updated."
-    : "Billboard created.";
-  const action = initialData ? "Saves change" : "Create billboard";
+  const title = initialData ? "Edit size" : "Create size";
+  const description = initialData ? "Edit a size" : "Add a new size";
+  const toastMessage = initialData ? "Size updated." : "Size created.";
+  const action = initialData ? "Saves change" : "Create size";
 
-  const form = useForm<BillboardsFormValues>({
+  const form = useForm<SizeFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
-      label: "",
-      imageUrl: "",
+      name: "",
+      value: "",
     },
   });
+  console.log(params.sizeId);
 
-  const onSubmit = async (data: BillboardsFormValues) => {
+  const onSubmit = async (data: SizeFormValues) => {
     try {
       setLoading(true);
       if (initialData) {
         await axios.patch(
-          `/api/stores/${params.storeId}/billboards/${params.billboardId}`,
+          `/api/stores/${params.storeId}/sizes/${params.sizeId}`,
           data
         );
       } else {
-        await axios.post(`/api/stores/${params.storeId}/billboards`, data);
+        await axios.post(`/api/stores/${params.storeId}/sizes`, data);
       }
-      router.refresh()
-      router.push(`/${params.storeId}/billboards`);
+      router.replace("/");
+
+      router.refresh();
+      router.push(`/${params.storeId}/sizes`);
       toast.success(toastMessage);
     } catch (error) {
       toast.error("Something went wrong");
@@ -81,15 +81,17 @@ const BillboardsForm: React.FC<BillboardsFormProps> = ({ initialData }) => {
     try {
       setLoading(true);
       await axios.delete(
-        `/api/stores/${params.storeId}/billboards/${params.billboardId}`
+        `/api/stores/${params.storeId}/sizes/${params.sizeId}`
       );
 
+      router.replace("/");
       router.refresh();
-      router.push("/");
-      toast.success("Billboards deleted");
+
+      router.push(`/${params.storeId}/sizes`);
+      toast.success("size deleted");
     } catch (error) {
       toast.error(
-        "Make sure you removed all categories using this billboard first."
+        "Make sure you removed all categories using this size first."
       );
     } finally {
       setLoading(false);
@@ -126,36 +128,33 @@ const BillboardsForm: React.FC<BillboardsFormProps> = ({ initialData }) => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-semibold">
-                  Background image
-                </FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    value={field.value ? [field.value] : []}
-                    disabled={loading}
-                    onChange={(url) => field.onChange(url)}
-                    onRemove={() => field.onChange("")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <div className="grid grid-cols-3 gap-8">
             <FormField
               control={form.control}
-              name="label"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-semibold">Label</FormLabel>
+                  <FormLabel className="font-semibold">Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Billboard label..."
+                      placeholder="Size name..."
+                      disabled={loading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold">Value</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Size value..."
                       disabled={loading}
                       {...field}
                     />
@@ -174,4 +173,4 @@ const BillboardsForm: React.FC<BillboardsFormProps> = ({ initialData }) => {
   );
 };
 
-export default BillboardsForm;
+export default SizesForm;

@@ -4,11 +4,11 @@ import CategoryForm from "./components/category-form";
 const CategoriesPage = async ({
   params,
 }: {
-  params: { billboardId: string; storeId: string };
+  params: { categoriesId: string; storeId: string };
 }) => {
   const category = await prismadb.category.findFirst({
     where: {
-      id: params.billboardId,
+      id: params.categoriesId,
     },
   });
 
