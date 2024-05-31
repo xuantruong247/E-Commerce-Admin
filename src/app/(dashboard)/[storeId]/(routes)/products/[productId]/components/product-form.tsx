@@ -94,16 +94,16 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setLoading(true);
       if (initialData) {
         await axios.patch(
-          `/api/stores/${params.storeId}/colors/${params.colorId}`,
+          `/api/stores/${params.storeId}/products/${params.productId}`,
           data
         );
       } else {
-        await axios.post(`/api/stores/${params.storeId}/colors`, data);
+        await axios.post(`/api/stores/${params.storeId}/products`, data);
       }
       router.replace("/");
 
       router.refresh();
-      router.push(`/${params.storeId}/colors`);
+      router.push(`/${params.storeId}/products`);
       toast.success(toastMessage);
     } catch (error) {
       toast.error("Something went wrong");
@@ -116,17 +116,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
     try {
       setLoading(true);
       await axios.delete(
-        `/api/stores/${params.storeId}/colors/${params.colorId}`
+        `/api/stores/${params.storeId}/products/${params.productId}`
       );
-
       router.replace("/");
       router.refresh();
-
-      router.push(`/${params.storeId}/colors`);
-      toast.success("colors deleted");
+      router.push(`/${params.storeId}/products`);
+      toast.success("Products deleted");
     } catch (error) {
       toast.error(
-        "Make sure you removed all categories using this color first."
+        "Make sure you removed all categories using this product first."
       );
     } finally {
       setLoading(false);
