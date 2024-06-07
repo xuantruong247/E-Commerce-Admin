@@ -15,7 +15,7 @@ export const GET = async (
 
     return NextResponse.json(color);
   } catch (error) {
-    console.log("[SIZE_GET]", error);
+    console.log("[COLOR_GET]", error);
     return new NextResponse("Interal Error Server", { status: 500 });
   }
 };
@@ -60,7 +60,7 @@ export const PATCH = async (
 
     return NextResponse.json(color);
   } catch (error) {
-    console.log("[SIZE_PATCH]", error);
+    console.log("[COLOR_PATCH]", error);
     return new NextResponse("Interal Error Server", { status: 500 });
   }
 };
@@ -98,7 +98,7 @@ export const DELETE = async (
 
     return NextResponse.json(color);
   } catch (error) {
-    console.log("[SIZE_DELETE]", error);
+    console.log("[COLOR_DELETE]", error);
     return new NextResponse("Interal Error Server", { status: 500 });
   }
 };

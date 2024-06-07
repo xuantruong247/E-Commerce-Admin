@@ -1,6 +1,5 @@
 import prismadb from "@/lib/prismaDB";
 import { auth } from "@clerk/nextjs/server";
-import { url } from "inspector";
 import { NextResponse } from "next/server";
 
 export const POST = async (
@@ -17,7 +16,7 @@ export const POST = async (
       colorId,
       sizeId,
       images,
-      isFetured,
+      isFeatured,
       isArchived,
     } = body;
     if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
@@ -27,9 +26,7 @@ export const POST = async (
       !categoryId ||
       !colorId ||
       !sizeId ||
-      !images ||
-      !isArchived ||
-      !isFetured
+      !images
     )
       return new NextResponse("Missing text", { status: 400 });
 
@@ -57,7 +54,7 @@ export const POST = async (
         name,
         price,
         isArchived,
-        isFetured,
+        isFeatured,
         colorId,
         sizeId,
         categoryId,
@@ -71,7 +68,7 @@ export const POST = async (
     });
     return NextResponse.json(product);
   } catch (error) {
-    console.log("[COLOR_POST]", error);
+    console.log("[PRODUCT_POST]", error);
     return new NextResponse("Interal Error Server", { status: 500 });
   }
 };
@@ -81,17 +78,36 @@ export const GET = async (
   { params }: { params: { storeId: string } }
 ) => {
   try {
+    const { searchParams } = new URL(req.url);
+    const categoryId = searchParams.get("categoryId") || undefined;
+    const colorId = searchParams.get("colorId") || undefined;
+    const sizeId = searchParams.get("sizeId") || undefined;
+    const isFeatured = searchParams.get("isFeatured");
     if (!params.storeId) {
       return new NextResponse("Store id is required", { status: 400 });
     }
-    const colors = await prismadb.color.findMany({
+    const products = await prismadb.product.findMany({
       where: {
         storeId: params.storeId,
+        categoryId,
+        colorId,
+        sizeId,
+        isFeatured: isFeatured ? true : undefined,
+        isArchived: false,
+      },
+      include: {
+        images: true,
+        category: true,
+        color: true,
+        size: true,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
-    return NextResponse.json(colors);
+    return NextResponse.json(products);
   } catch (error) {
-    console.log("[COLOR_GET]", error);
+    console.log("[PRODUCT_GET]", error);
     return new NextResponse("Interal Error Server", { status: 500 });
   }
 };

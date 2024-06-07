@@ -201,7 +201,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   <FormLabel className="font-semibold">Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Color name..."
+                      placeholder="Product name..."
                       disabled={loading}
                       {...field}
                     />
